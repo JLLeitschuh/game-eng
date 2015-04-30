@@ -1,4 +1,5 @@
 package core;
+
 public class ActorManager implements Runnable {
 	/**
 	 * Written by Jack Rivadeneira
@@ -23,9 +24,9 @@ public class ActorManager implements Runnable {
 		init();
 		while (alive) {
 			runActors();
-			addAsteriods();
-			if (gen % 500 == 0)
-				delay(5);
+//			addAsteriods();
+			if (gen % 100 == 0)
+				delay(10);
 			gen++;
 		}
 	}
@@ -42,7 +43,7 @@ public class ActorManager implements Runnable {
 
 	private void init() {
 		act[0] = new Player();
-		addAsteriods();
+//		addAsteriods();
 	}
 
 	public void kill() {
@@ -90,6 +91,15 @@ public class ActorManager implements Runnable {
 			i++;
 		}
 		System.out.println("Out of room!");
+	}
+
+	public boolean hasActor(Actor a) {
+		int i = 0;
+		while (i < act.length) {
+			if (act[i] == a)
+				return true;
+		}
+		return false;
 	}
 
 	private void delay(int time) {

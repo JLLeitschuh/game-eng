@@ -1,4 +1,5 @@
 package core;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -25,8 +26,7 @@ public class Display extends JFrame implements MouseListener, KeyListener,
 	public static Graphics2D bg;
 	public static Image buff;
 	public static ActorManager act;
-	private static boolean stopdraw;
-	private static ArrayList<DrawData> drawQueue= new ArrayList<DrawData>();
+	private static ArrayList<DrawData> drawQueue = new ArrayList<DrawData>();
 	public static int clickX, clickY;
 	public static int mouseX, mouseY;
 
@@ -82,12 +82,12 @@ public class Display extends JFrame implements MouseListener, KeyListener,
 		bg.setColor(Color.WHITE);
 		bg.drawString("Lives: " + Player.lives, 10, 60);
 	}
-	
-	public synchronized void drawActors(){
+
+	public synchronized void drawActors() {
 		ArrayList<DrawData> queue = new ArrayList<DrawData>();
 		queue.addAll(drawQueue);
 		gen++;
-		while(queue.size()>0){
+		while (queue.size() > 0) {
 			drawActor(queue.get(0));
 			drawQueue.remove(0);
 			queue.remove(0);
@@ -99,57 +99,39 @@ public class Display extends JFrame implements MouseListener, KeyListener,
 		bg.setFont(new Font("Lucida Console", Font.PLAIN, 32));
 		bg.drawString("Game Over", 300, 300);
 	}
-	
-	public static void addToDrawQueue(Actor a){
+
+	public static void addToDrawQueue(Actor a) {
 		drawQueue.add(a.getDrawData());
 	}
 
+	public static boolean drawQueueHas(Actor a) {
+		return drawQueue.contains(a);
+	}
+
 	private void drawActor(DrawData a) {
-		if (stopdraw)
-			return;
 		if (a != null) {
-			int r = 255;
-			int g = 255;
-			int b = 255;
-			boolean rec = false;
-			boolean fill = true;
-			if (a.team == 2)
-				fill = false;// r = b = 255;
-			if (a.team == 1)
-				b = 255;
-			if (a.team == 6) {
-				r = (int) a.lifetime;
-				g = 0;
-				b = 0;
+			if (a.team == 1) {
+				bg.setColor(Color.YELLOW);
+				bg.fillOval(a.x - a.length / 2, a.y + a.length / 2, a.length,
+						a.length);
+				return;
+			}
+			if (a.team == 2) {
+				bg.setColor(Color.WHITE);
+				bg.drawOval(a.x - a.length / 2, a.y + a.length / 2, a.length,
+						a.length);
 			}
 			if (a.team == 5) {
-				int life = (int) a.lifetime;
-				if (life < 256) {
-					r = life;
-					g = 0;
-					b = 0;
-				} else if (life < 511) {
-					g = life - 256;
-					b = 0;
-				} else
-					b = life % 256;
-				rec = false;
+				int msk = 0x00FF;
+				int r, g, b;
+				r = (a.gen >> 16) & msk;
+				g = (a.gen >> 8) & msk;
+				b = (a.gen) & msk;
+				bg.setColor(new Color(r, g, b));
+				bg.fillOval(a.x - a.length / 2, a.y + a.length / 2, a.length,
+						a.length);
 			}
-			int w = a.length;
-			Color c = (new Color(r, g, b));
-			bg.setColor(c);
 
-			if (fill) {
-				if (rec)
-					bg.fillRect((int) a.x - (w / 2), (int) a.y - (w / 2), w, w);
-				else
-					bg.fillOval((int) a.x - (w / 2), (int) a.y - (w / 2), w, w);
-			} else {
-				if (rec)
-					bg.drawRect((int) a.x - (w / 2), (int) a.y - (w / 2), w, w);
-				else
-					bg.drawOval((int) a.x - (w / 2), (int) a.y - (w / 2), w, w);
-			}
 		}
 	}
 
@@ -163,16 +145,14 @@ public class Display extends JFrame implements MouseListener, KeyListener,
 
 	public void update(Graphics g) {
 		delay(1);
-		stopdraw = true;
 		g.drawImage(buff, 0, 0, this);
-		bg.clearRect(0, 0, 800, 600);
+		if (gen % 200 == 0)
+			bg.clearRect(0, 0, 800, 600);
 		drawScore();
-		stopdraw = false;
-		
 	}
 
 	public static boolean withinView(double X, double Y) {
-		return !(X > 800 || X < 0 || Y > 600 || Y < 0);
+		return !(X > 80000 || X < 0 || Y > 60000 || Y < 0);
 	}
 
 	public void mouseClicked(MouseEvent e) {

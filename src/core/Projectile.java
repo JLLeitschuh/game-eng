@@ -8,12 +8,10 @@ public class Projectile extends Actor {
 
 	public Projectile(Actor Parent) {
 		super(20);
-		speed = 0.8;
 		parent = Parent;
 		team = parent.team;
 		x = parent.x;
 		y = parent.y;
-		length = 2;
 	}
 
 	protected void AI() {
@@ -24,6 +22,10 @@ public class Projectile extends Actor {
 		 * (contact(Display.act.get(i)) && Display.act.get(i) != parent) {
 		 * Display.act.get(i).alive = false; alive = false; break; } i++; }
 		 */
+	}
+
+	public DrawData getDrawData() {
+		return new DrawData(x,y,team, ActorData.PROJECTILE_DIAMETER);
 	}
 
 }

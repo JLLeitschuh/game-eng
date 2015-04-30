@@ -3,69 +3,53 @@ public abstract class Actor {
 	/**
 	 * Written by Jack Rivadeneira
 	 */
-	protected double x = 400;
-	protected double y = 300;
-	protected int lx, ly;
-	protected double xs, ys;
-	protected double speed;
-	protected double mass;
+	protected int x = 40000; // divide by 100 for pixel position
+	protected int y = 30000;
+	protected int xs, ys;
 	protected int frequency;
-	private boolean locked;
 	protected boolean alive;
-	protected int length;
 	protected int team;
 	protected int gen;
-	private int lgen;
 	public Actor(int freq) {
 		frequency = freq;
-		mass = 10;
-		speed = 0;
-		locked = false;
 		alive = true;
-		length = 30;
 		gen = 0;
 	}
-
+	/**
+	 * calls AI move and requestDraw and then increments gen.
+	 */
 	public void run() {
 		AI();
 		move();
-		if (((int) x != lx || (int) y != ly) || lgen != Display.gen) {
-			lx = (int) x;
-			ly = (int) y;
-			lgen = Display.gen;
-			Display.addToDrawQueue(this);
-		}
+		requestDraw();
 		gen++;
 	}
 
-	public void lock() {
-		locked = true;
-	}
-
-	public void unlock() {
-		locked = false;
+	public void requestDraw(){
+		if (!Display.drawQueueHas(this)) {
+			Display.addToDrawQueue(this);
+		}
 	}
 	
-	public DrawData getDrawData(){
-		return new DrawData(x, y, lx, ly, mass, length, team);
-	}
+	public abstract DrawData getDrawData();
+//		return new DrawData(x/100, y/100, team, 30);
+//	}
 
 	protected void move() {
-		if ((!alive) || locked)
+		if ((!alive))
 			return;
-		x += xs * speed;
-		y -= ys * speed;
+		x += xs;
+		y -= ys;
 	}
 
-	protected void setVelocity(double X, double Y) {
-		double V = Math.sqrt((X * X) + (Y * Y));
-		xs = X / V;
-		ys = Y / V;
+	protected void setVelocity(int X, int Y) {
+		xs = X;
+		ys = Y;
 	}
 
-	protected void moveToward(double X, double Y) {
-		X = X - x;
-		Y = -(Y - y);
+	protected void moveToward(int X, int Y) {
+		X -= x;
+		Y = y - Y;
 		setVelocity(X, Y);
 	}
 
@@ -83,13 +67,13 @@ public abstract class Actor {
 		return Math.sqrt((X - x) * (X - x) + (Y - y) * (Y - y));
 	}
 
-	protected boolean contact(Actor a) {
+	protected boolean inRange(Actor a, int length) {
 		if (a != this)
-			return (distanceTo(a) <= (length + a.length) / 2);
+			return (distanceTo(a) <= length);
 		return false;
 	}
 
-	protected void setLocation(double X, double Y) {
+	protected void setLocation(int X, int Y) {
 		x = X;
 		y = Y;
 	}

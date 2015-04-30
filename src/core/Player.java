@@ -1,4 +1,5 @@
 package core;
+
 import java.util.Random;
 
 public final class Player extends Actor {
@@ -6,37 +7,28 @@ public final class Player extends Actor {
 	 * Written by Jack Rivadeneira
 	 */
 	private double t, ts;
-	private double ta;
 	public static int lives;
 	private boolean gunReady;
 	private Actor front;
+	public int length;
 
 	public Player() {
 		super(100);
-		speed = 0.03;
 		team = 1;
+		length = 30;
 		front = new Ball(100);
-		front.team = 1;
-		front.length = 15;
 		t = -Math.PI / 2;
-		ys = .01;
 		Display.act.add(front);
-		ta = 0.00001;
 		gunReady = true;
-		lives = 3;
+		lives = 999;
 	}
 
 	public Player(int Lives) {
 		super(100);
-		speed = 0.03;
 		team = 1;
 		front = new Ball(100);
-		front.team = 1;
-		front.length = 15;
 		t = -Math.PI / 2;
-		ys = .01;
 		Display.act.add(front);
-		ta = 0.00001;
 		gunReady = true;
 		lives = Lives;
 	}
@@ -49,38 +41,44 @@ public final class Player extends Actor {
 	}
 
 	private void control() {
-		// Dampening
-		// xs *= 0.999;
-		// ys *= 0.999;
-		// ts *= 0.999;
 
-		if (Display.mouseControl)
-			t = Math.atan2(x - Display.mouseX, Display.mouseY - y) + Math.PI
-					/ 2;
+		int cx = 100 * ActorData.PLAYER_FRONT_DISTANCE;
+		int cy = 100 * ActorData.PLAYER_FRONT_DISTANCE;
 
+		cx *= Math.cos(t);
+		cy *= Math.sin(t);
+
+		cx += x;
+		cy += y ;
+
+		front.x = cx;
+		front.y = cy + ActorData.PLAYER_RADIUS * 100;
+		ts *= .9;
 		if (Display.keyW) {
-			xs += speed * Math.cos(t);
-			ys -= speed * Math.sin(t);
-			showRocketTrail();
-		}
-		if (Display.keyA)
-			ts -= ta;
-		if (Display.keyS) {
-			ts *= 0.99;
-			xs *= .999;
-			ys *= .999;
-		}
-		if (Display.keyD)
-			ts += ta;
-		if (Display.mouseOne)
-			shoot();
-		else
-			gunReady = true;
-		// keyboard control
-		front.x = x + 30 * Math.cos(t);
-		front.y = y + 30 * Math.sin(t);
-		// mouse control
 
+			// xs += 5 * Math.cos(t);
+			// ys -= 5 * Math.sin(t);
+			// int speed = (int) Math.sqrt(xs * xs + ys * ys);
+			// if (speed > ActorData.MAX_SPEED) {
+			// xs *= 0.99;
+			// ys *= 0.99;
+			// }
+			showRocketTrail(1);
+		}
+		if (Display.keyA) {
+			ts += -.003;
+		}
+		if (Display.keyS) {
+			// ys += -5;
+		}
+		if (Display.keyD) {
+			ts += .003;
+		}
+		if (Display.mouseOne) {
+			shoot();
+		}
+
+		move();
 	}
 
 	protected void move() {
@@ -89,10 +87,10 @@ public final class Player extends Actor {
 	}
 
 	private void keepIn() {
-		if (x < 0 || x > 800)
-			x = x > 800 ? 0 : 800;// ((int) (x / 800)) * (798) + 1;
-		if (y < 0 || y > 600)
-			y = y > 600 ? 0 : 600;// ((int) (y / 600)) * (598) + 1;
+		if (x < 0 || x > 80000)
+			x = x > 80000 ? 0 : 80000;// ((int) (x / 800)) * (798) + 1;
+		if (y < 0 || y > 60000)
+			y = y > 60000 ? 0 : 60000;// ((int) (y / 600)) * (598) + 1;
 	}
 
 	private void shoot() {
@@ -105,31 +103,37 @@ public final class Player extends Actor {
 	}
 
 	private void showRocketTrail() {
-		if (gen % 8 == 0) {
-			Particle p = new Particle(50, 765);
+		if (gen % 1 == 0) {
+			Particle p = new Particle(60);
 			p.setLocation(x, y);
-			p.speed = -1;
 			Random r = new Random();
-
-			p.moveToward(front);
-			p.xs -= (r.nextDouble() / 4) - 0.125;
-			p.ys -= (r.nextDouble() / 4) - 0.125;
+			p.moveToward(front.x, front.y);
+			p.xs /= -4;
+			p.ys /= -4;
+			// p.xs -= (r.nextInt(200)) - 100;
+			// p.ys -= (r.nextInt(200)) - 100;
 			Display.act.add(p);
 		}
 	}
 
-	protected void kill() {
+	private void showRocketTrail(int k) {
+		while (k > 0) {
+			showRocketTrail();
+			k--;
+		}
+	}
 
+	protected void kill() {
 		int i = 0;
 		while (i < 50) {
-			Particle p = new Particle(50, 765);
+			Particle p = new Particle(60);
 			p.setLocation(x, y);
-			p.speed = -1;
+			// p.speed = -1;
 			Random r = new Random();
 			p.moveToward(front);
-			p.xs = r.nextDouble() - 0.5;
-			p.ys = r.nextDouble() - 0.5;
-			p.length = 10;
+			p.xs = r.nextInt(101) - 50;
+			p.ys = r.nextInt(101) - 50;
+			p.team = 6;
 			Display.act.add(p);
 			i++;
 		}
@@ -138,6 +142,10 @@ public final class Player extends Actor {
 		lives--;
 		if (lives == 0)
 			Display.gameOver = true;
+	}
+
+	public DrawData getDrawData() {
+		return new DrawData(x, y, team, ActorData.PLAYER_DIAMETER);
 	}
 
 }

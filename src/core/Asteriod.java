@@ -1,4 +1,5 @@
 package core;
+
 import java.util.Random;
 
 public class Asteriod extends Actor {
@@ -8,19 +9,15 @@ public class Asteriod extends Actor {
 	 */
 
 	protected int level;
-	protected int lengthMultiplier = 20;
 	public static int count = 0;
 
 	public Asteriod() {
 		super(100);
 		level = 3;
 		team = 2;
-		length = level * lengthMultiplier;
-		speed = .25;
 		Random r = new Random();
-		xs = r.nextDouble() - .5;
-		ys = r.nextDouble() - .5;
-		unlock();
+		xs = r.nextInt(101) - 50;
+		ys = r.nextInt(101) - 50;
 		x = r.nextInt();
 		y = r.nextInt();
 		count++;
@@ -29,7 +26,6 @@ public class Asteriod extends Actor {
 	private Asteriod(int lev) {
 		super(200);
 		level = lev;
-		length = level * lengthMultiplier;
 		team = 2;
 		count++;
 	}
@@ -44,31 +40,34 @@ public class Asteriod extends Actor {
 
 		while (i < Display.act.size()) {
 			Actor a = Display.act.get(i);
-			if (a != null)
+			if (a != null) {
+				int playerContactRange = (getDiameter() + a.getDrawData().length) *50;
 				if (alive)
 					if (a != this)
 						if (a.team == 1)
 							if (Player.lives > 0)
-								if (a.distanceTo(this) < (length + a.length - 8) >> 1) {
+								if (a.distanceTo(this) < playerContactRange) {
 									death(a);
 									break;
 								}
+
+			}
 			i++;
 		}
 	}
 
 	private void bounce() {
-		if (x > 800) {
+		if (x > 80000) {
 			x = 0;
 		}
 		if (x < 0) {
-			x = 800;
+			x = 80000;
 		}
-		if (y > 600) {
+		if (y > 60000) {
 			y = 0;
 		}
 		if (y < 0) {
-			y = 600;
+			y = 60000;
 		}
 	}
 
@@ -85,21 +84,19 @@ public class Asteriod extends Actor {
 		Asteriod a = new Asteriod(level - 1);
 		a.x = x;
 		a.y = y;
-		a.xs = ys;
-		a.ys = -xs;
-		a.speed = speed * 2;
+		a.xs = ys * 2;
+		a.ys = -xs * 2;
 		Asteriod b = new Asteriod(level - 1);
 		b.x = x;
 		b.y = y;
-		b.xs = -ys;
-		b.ys = xs;
-		b.speed = speed * 2;
+		b.xs = -ys * 2;
+		b.ys = xs * 2;
 		Display.act.add(a);
 		Display.act.add(b);
-		if (a.distanceTo(b) < (a.length + b.length) / 2) {
-			a.move();
-			b.move();
-		}
+		// if (a.distanceTo(b) < (a.length + b.length) / 2) {
+		// a.move();
+		// b.move();
+		// }
 		alive = false;
 	}
 
@@ -107,6 +104,14 @@ public class Asteriod extends Actor {
 		hit();
 		a.kill();
 		count--;
+	}
+
+	protected int getDiameter() {
+		return ActorData.ASTEROID_DIAMETER_MULTIPLIER * level;
+	}
+
+	public DrawData getDrawData() {
+		return new DrawData(x, y, team, getDiameter());
 	}
 
 }

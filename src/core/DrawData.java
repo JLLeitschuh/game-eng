@@ -1,35 +1,32 @@
 package core;
 
 public class DrawData {
-	public double x;
-	public double y;
-	public int lx, ly;
-	public double mass;
-	public int length;
-	public int team;
-	public int lifetime;
 
-	public DrawData(double X, double Y, int LX, int LY, double MASS,
-			int LENGTH, int TEAM, int LIFETIME) {
-		x = X;
-		y = Y;
-		lx = LX;
-		ly = LY;
-		mass = MASS;
-		length = LENGTH;
-		team = TEAM;
-		lifetime = LIFETIME;
+	public int x = 400;
+	public int y = 300;
+	public int team;
+	public int gen;
+	public int length;
+
+	public DrawData(int X, int Y, int TEAM, int LENGTH, int GEN) {
+		this.x = X / 100;
+		this.y = Y / 100;
+		this.team = TEAM;
+		this.gen = GEN;
+		this.length = LENGTH;
 	}
 
-	public DrawData(double X, double Y, int LX, int LY, double MASS,
-			int LENGTH, int TEAM) {
-		x = X;
-		y = Y;
-		lx = LX;
-		ly = LY;
-		mass = MASS;
-		length = LENGTH;
-		team = TEAM;
+	/**
+	 * 
+	 * @param X
+	 * @param Y
+	 * @param TEAM
+	 */
+	public DrawData(int X, int Y, int TEAM, int LENGTH) {
+		this.x = X / 100;
+		this.y = Y / 100;
+		this.team = TEAM;
+		this.length = LENGTH;
 	}
 
 }
