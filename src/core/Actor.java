@@ -24,6 +24,8 @@ public abstract class Actor {
 		alive = true;
 		length = 30;
 		gen = 0;
+
+//		Display.addToDrawQueue(this);
 	}
 
 	public void run() {
@@ -33,7 +35,6 @@ public abstract class Actor {
 			lx = (int) x;
 			ly = (int) y;
 			lgen = Display.gen;
-			Display.addToDrawQueue(this);
 		}
 		gen++;
 	}

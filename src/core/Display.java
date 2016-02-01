@@ -1,4 +1,5 @@
 package core;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -24,9 +25,9 @@ public class Display extends JFrame implements MouseListener, KeyListener,
 	public static int gen;
 	public static Graphics2D bg;
 	public static Image buff;
-	public static ActorManager act;
+	public static ActorManager act = new ActorManager(200);
 	private static boolean stopdraw;
-	private static ArrayList<DrawData> drawQueue= new ArrayList<DrawData>();
+	// private static ArrayList<DrawData> drawQueue = new ArrayList<DrawData>();
 	public static int clickX, clickY;
 	public static int mouseX, mouseY;
 
@@ -49,7 +50,6 @@ public class Display extends JFrame implements MouseListener, KeyListener,
 		addKeyListener(this);
 		addMouseMotionListener(this);
 		setUndecorated(true);
-		act = new ActorManager(200);
 		gen = 0;
 		setVisible(true);
 	}
@@ -82,31 +82,37 @@ public class Display extends JFrame implements MouseListener, KeyListener,
 		bg.setColor(Color.WHITE);
 		bg.drawString("Lives: " + Player.lives, 10, 60);
 	}
-	
-	public synchronized void drawActors(){
-		ArrayList<DrawData> queue = new ArrayList<DrawData>();
-		queue.addAll(drawQueue);
+
+	public synchronized void drawActors() {
+		// if (stopdraw)
+		// return;
+		// stopdraw = true;
+		// ArrayList<DrawData> queue = new ArrayList<DrawData>();
+		// queue.addAll(drawQueue);
 		gen++;
-		while(queue.size()>0){
-			drawActor(queue.get(0));
-			drawQueue.remove(0);
-			queue.remove(0);
+		int i = 0;
+		while (i < act.size()) {
+			Actor a = act.get(i);
+			if (a != null)
+				drawActor(act.get(i).getDrawData());
+			i++;
 		}
+
+		stopdraw = false;
 	}
 
-	public synchronized void drawGameOver() {
+	public void drawGameOver() {
 		bg.setColor(Color.WHITE);
 		bg.setFont(new Font("Lucida Console", Font.PLAIN, 32));
 		bg.drawString("Game Over", 300, 300);
 	}
-	
-	public static void addToDrawQueue(Actor a){
-		drawQueue.add(a.getDrawData());
-	}
+
+	// public static void addToDrawQueue(Actor a) {
+	// drawQueue.add(a.getDrawData());
+	// }
 
 	private void drawActor(DrawData a) {
-		if (stopdraw)
-			return;
+
 		if (a != null) {
 			int r = 255;
 			int g = 255;
@@ -163,12 +169,14 @@ public class Display extends JFrame implements MouseListener, KeyListener,
 
 	public void update(Graphics g) {
 		delay(1);
-		stopdraw = true;
+		if (stopdraw)
+			return;
+		// stopdraw = true;
 		g.drawImage(buff, 0, 0, this);
 		bg.clearRect(0, 0, 800, 600);
 		drawScore();
-		stopdraw = false;
-		
+		// stopdraw = false;
+
 	}
 
 	public static boolean withinView(double X, double Y) {

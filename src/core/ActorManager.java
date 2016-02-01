@@ -13,6 +13,7 @@ public class ActorManager implements Runnable {
 		alive = true;
 		gen = 0;
 		t = new Thread(this);
+		init();
 	}
 
 	public void go() {
@@ -32,17 +33,18 @@ public class ActorManager implements Runnable {
 
 	private void addAsteriods() {
 		if (Asteriod.count == 0) {
-			add(new Asteriod());
-			add(new Asteriod());
-			add(new Asteriod());
-			add(new Asteriod());
+//			add(new Asteriod());
+//			add(new Asteriod());
+//			add(new Asteriod());
+//			add(new Asteriod());
 		}
 
 	}
 
 	private void init() {
 		act[0] = new Player();
-		addAsteriods();
+		act[1] = ((Player)act[0]).getFront();
+//		addAsteriods();
 	}
 
 	public void kill() {

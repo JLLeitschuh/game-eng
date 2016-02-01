@@ -1,4 +1,5 @@
 package core;
+
 import java.util.Random;
 
 public final class Player extends Actor {
@@ -20,7 +21,7 @@ public final class Player extends Actor {
 		front.length = 15;
 		t = -Math.PI / 2;
 		ys = .01;
-		Display.act.add(front);
+		// Display.act.add(front);
 		ta = 0.00001;
 		gunReady = true;
 		lives = 3;
@@ -46,6 +47,10 @@ public final class Player extends Actor {
 			kill();
 		control();
 		keepIn();
+	}
+
+	public Actor getFront() {
+		return this.front;
 	}
 
 	private void control() {
