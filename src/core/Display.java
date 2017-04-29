@@ -1,4 +1,5 @@
 package core;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -10,7 +11,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
@@ -26,7 +26,6 @@ public class Display extends JFrame implements MouseListener, KeyListener,
 	public static Image buff;
 	public static ActorManager act;
 	private static boolean stopdraw;
-	private static ArrayList<DrawData> drawQueue= new ArrayList<DrawData>();
 	public static int clickX, clickY;
 	public static int mouseX, mouseY;
 
@@ -50,10 +49,11 @@ public class Display extends JFrame implements MouseListener, KeyListener,
 		addMouseMotionListener(this);
 		setUndecorated(true);
 		act = new ActorManager(200);
+		act.go();
 		gen = 0;
 		setVisible(true);
 	}
-
+	Thread actorManagerThread = new Thread(act);
 	public void init() {
 		buff = createImage(800, 600);
 		bg = (Graphics2D) buff.getGraphics();
@@ -61,7 +61,6 @@ public class Display extends JFrame implements MouseListener, KeyListener,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
 				RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-		act.go();
 	}
 
 	public void paint(Graphics g) {
@@ -82,15 +81,14 @@ public class Display extends JFrame implements MouseListener, KeyListener,
 		bg.setColor(Color.WHITE);
 		bg.drawString("Lives: " + Player.lives, 10, 60);
 	}
-	
-	public synchronized void drawActors(){
-		ArrayList<DrawData> queue = new ArrayList<DrawData>();
-		queue.addAll(drawQueue);
-		gen++;
-		while(queue.size()>0){
-			drawActor(queue.get(0));
-			drawQueue.remove(0);
-			queue.remove(0);
+
+	private void drawActors() {
+		int i = 0;
+		while (i < act.size()) {
+			Actor a = act.get(i);
+			if (a != null)
+				drawActor(act.get(i).getDrawData());
+			i++;
 		}
 	}
 
@@ -98,10 +96,6 @@ public class Display extends JFrame implements MouseListener, KeyListener,
 		bg.setColor(Color.WHITE);
 		bg.setFont(new Font("Lucida Console", Font.PLAIN, 32));
 		bg.drawString("Game Over", 300, 300);
-	}
-	
-	public static void addToDrawQueue(Actor a){
-		drawQueue.add(a.getDrawData());
 	}
 
 	private void drawActor(DrawData a) {
@@ -168,7 +162,7 @@ public class Display extends JFrame implements MouseListener, KeyListener,
 		bg.clearRect(0, 0, 800, 600);
 		drawScore();
 		stopdraw = false;
-		
+
 	}
 
 	public static boolean withinView(double X, double Y) {

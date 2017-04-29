@@ -33,7 +33,6 @@ public abstract class Actor {
 			lx = (int) x;
 			ly = (int) y;
 			lgen = Display.gen;
-			Display.addToDrawQueue(this);
 		}
 		gen++;
 	}
